@@ -16,6 +16,8 @@ const WORDS = [
 
 let numWrong = 0;
 
+
+
 // Loop over the chars in `word` and create divs.
 //
 
@@ -49,8 +51,19 @@ const isLetterInWord = (letter) => document.querySelector(`div.${letter}`) !== n
 
 // Called when `letter` is in word. Update contents of divs with `letter`.
 //
-const handleCorrectGuess = (letter) => {
-  // Replace this with your code
+const handleCorrectGuess = (letter) => {  
+  //check if user's won the game
+  
+  let correctGuess = document.querySelectorAll(`.letter-box.${letter}`);
+  // console.log(correctGuess);
+
+  for (element of correctGuess) {    
+    element.innerHTML = letter;
+  }
+
+  if (winnerNewGame() === true) {
+    document.getElementById('win').style.display = "";    
+  }
 };
 
 //
@@ -61,13 +74,37 @@ const handleCorrectGuess = (letter) => {
 // all buttons and show the "play again" message.
 
 const handleWrongGuess = () => {
-  numWrong += 1;
-  // Replace this with your code
+  numWrong += 1;  
+  
+  let imgPath = `/static/images/guess${numWrong}.png`;    //setting the new path for the htnl img
+  let sharkImg = document.querySelector('img');          //Getting the img using querySelector
+  sharkImg.src = imgPath;                               //Setting the src from html to be the new path
+  // console.log(imgPath)
+  
+  if (numWrong == 5) {
+    let disableButton = document.querySelectorAll(`button`);
+    // console.log(disableButton)
+    for (button of disableButton){
+      disableLetterButton(button);
+    } 
+  document.getElementById("play-again").style.display = "";
+            
+  }
 };
 
 //  Reset game state. Called before restarting the game.
 const resetGame = () => {
   window.location = '/sharkwords';
+};
+
+const winnerNewGame = () => {
+  for (const element of document.getElementsByClassName('letter-box')) {
+    console.log(element);
+    if (element.innerHTML === "" ){
+      return false
+    };    
+  };
+  return true;
 };
 
 // This is like if __name__ == '__main__' in Python
@@ -78,12 +115,34 @@ const resetGame = () => {
 
   createDivsForChars(word);
   generateLetterButtons();
+  
 
   for (const button of document.querySelectorAll('button')) {
+    button.addEventListener('click', () => { 
+      let letterGuess = button.innerHTML;
+      disableLetterButton(button);
+
+      if (word.includes(letterGuess)) {
+        handleCorrectGuess(letterGuess);      //calling the correctguess function inside other function
+      } else {
+        handleWrongGuess();
+      }
+
+    });
+  
     // add an event handler to handle clicking on a letter button
-    // YOUR CODE HERE
+  let reeStartGame = document.getElementById("play-again");
+  // console.log(reeStartGame)
+  reeStartGame.addEventListener('click', () => {
+    resetGame();
+  });
+    
   }
 
   // add an event handler to handle clicking on the Play Again button
-  // YOUR CODE HERE
+  let playAgain = document.getElementById('win');
+  playAgain.addEventListener('click', () => {
+    resetGame();
+  });
+
 })();
